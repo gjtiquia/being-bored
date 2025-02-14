@@ -1,25 +1,19 @@
 ---
-import Button from './Button.astro';
+import Button from "./Button.astro";
+import Header from "./Header.astro";
 ---
 
 <div
   id="hero"
   class="container h-full mx-auto px-4 py-32 flex flex-col items-center justify-center"
 >
-  <h1
-    class="text-5xl sm:text-6xl font-bold text-stone-100 mb-4 text-center"
-  >
+  <Header />
+  <h1 class="text-5xl sm:text-6xl font-bold text-stone-100 mb-4 text-center">
     being bored
   </h1>
-  <h2 class="text-2xl text-stone-400 mb-12 text-center">
-    reset your mind
-  </h2>
+  <h2 class="text-2xl text-stone-400 mb-12 text-center">reset your mind</h2>
   <div class="flex flex-col gap-4 items-center justify-center">
-    <Button id="beginBtn">
-      begin
-    </Button>
-    <Button id="settingsBtn" variant="text">
-      settings
-    </Button>
+    <Button id="beginBtn"> begin </Button>
+    <Button id="settingsBtn" variant="text"> settings </Button>
   </div>
-</div> 
+</div>
