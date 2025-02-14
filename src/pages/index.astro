@@ -17,12 +17,66 @@ import Layout from "../layouts/Layout.astro";
 			<h2 class="text-2xl text-stone-400 mb-12 text-center">
 				reset your mind
 			</h2>
-			<button
-				id="beginBtn"
-				class="px-8 py-3 bg-stone-700 text-stone-100 rounded-lg hover:bg-stone-600 transition-colors text-lg"
+			<div class="flex flex-col gap-4 items-center justify-center">
+				<button
+					id="beginBtn"
+					class="px-8 py-3 bg-stone-700 text-stone-100 rounded-lg hover:bg-stone-600 transition-colors text-lg"
+				>
+					begin
+				</button>
+				<button
+					id="settingsBtn"
+					class="mt-2 text-stone-500 text-sm hover:text-stone-400 transition-colors underline"
+				>
+					settings
+				</button>
+			</div>
+		</div>
+
+		<!-- Settings Modal -->
+		<div id="settingsModal" class="hidden">
+			<div
+				class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-8"
 			>
-				begin
-			</button>
+				<div class="bg-stone-800 px-8 py-6 rounded-lg w-full max-w-md">
+					<h3 class="text-stone-100 text-xl mb-6">Settings</h3>
+
+					<div class="mb-6">
+						<label class="block text-stone-300 mb-2"
+							>Duration (minutes)</label
+						>
+						<input
+							type="range"
+							id="durationSlider"
+							min="1"
+							max="10"
+							value="10"
+							class="w-full accent-stone-600"
+						/>
+						<div
+							class="flex justify-between text-stone-400 text-sm mt-1"
+						>
+							<span>1 min</span>
+							<span id="durationValue">10 min</span>
+						</div>
+					</div>
+
+					<div class="flex gap-3">
+						<button
+							id="closeSettingsBtn"
+							class="px-4 py-2 bg-stone-700 text-stone-100 rounded-lg hover:bg-stone-600 transition-colors"
+						>
+							Close
+						</button>
+						<button
+							id="resetBtn"
+							class="px-4 py-2 text-stone-400 hover:text-stone-300 transition-colors"
+						>
+							Reset
+						</button>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<!-- Bored Screen -->
@@ -60,13 +114,70 @@ import Layout from "../layouts/Layout.astro";
 	// Event listeners
 	const beginButton = document.getElementById("beginBtn");
 	const doneButton = document.getElementById("doneBtn");
+	const settingsButton = document.getElementById("settingsBtn");
+	const closeSettingsButton = document.getElementById("closeSettingsBtn");
+	const resetButton = document.getElementById("resetBtn");
+	const durationSlider = document.getElementById(
+		"durationSlider",
+	) as HTMLInputElement;
+	const durationValue = document.getElementById("durationValue");
+	const settingsModal = document.getElementById("settingsModal");
 
-	if (beginButton && doneButton) {
+	let originalDuration = 10;
+	let currentDuration = 10;
+	let timerId: number;
+
+	if (
+		beginButton &&
+		doneButton &&
+		settingsButton &&
+		closeSettingsButton &&
+		resetButton &&
+		durationSlider
+	) {
 		beginButton.addEventListener("click", showBoredScreenAsync);
 		doneButton.addEventListener("click", resetScreenAsync);
+		settingsButton.addEventListener("click", showSettings);
+		closeSettingsButton.addEventListener("click", closeSettings);
+		resetButton.addEventListener("click", resetSettings);
+		durationSlider.addEventListener("input", updateDuration);
 	}
 
-	let timerId: number;
+	function showSettings() {
+		if (!settingsModal) return;
+		settingsModal.classList.remove("hidden");
+		updateCloseButton();
+	}
+
+	function closeSettings() {
+		if (!settingsModal) return;
+		settingsModal.classList.add("hidden");
+		originalDuration = currentDuration;
+	}
+
+	function resetSettings() {
+		if (!durationSlider || !durationValue) return;
+		currentDuration = 10;
+		durationSlider.value = "10";
+		durationValue.textContent = "10 min";
+		updateCloseButton();
+	}
+
+	function updateDuration() {
+		if (!durationSlider || !durationValue) return;
+		currentDuration = parseInt(durationSlider.value);
+		durationValue.textContent = `${currentDuration} min`;
+		updateCloseButton();
+	}
+
+	function updateCloseButton() {
+		if (!closeSettingsButton) return;
+		if (currentDuration !== originalDuration) {
+			closeSettingsButton.textContent = "Save and Close";
+		} else {
+			closeSettingsButton.textContent = "Close";
+		}
+	}
 
 	async function showBoredScreenAsync() {
 		const heroElement = document.getElementById("hero");
@@ -85,8 +196,7 @@ import Layout from "../layouts/Layout.astro";
 		boredElement.classList.remove("hidden");
 
 		// Start timer
-		// const duration = 10 * 60 * 1000; // in milliseconds
-		const duration = 3 * 1000; // in milliseconds
+		const duration = currentDuration * 60 * 1000; // in milliseconds
 		timerId = setTimeout(() => {
 			const modalElement = document.getElementById("completionModal");
 			if (!modalElement) return;
