@@ -192,6 +192,9 @@ import Layout from "../layouts/Layout.astro";
 			console.log("Fullscreen request failed:", err);
 		}
 
+		// Hide cursor when bored screen is shown
+		document.body.style.cursor = 'none';
+
 		heroElement.classList.add("hidden");
 		boredElement.classList.remove("hidden");
 
@@ -200,7 +203,11 @@ import Layout from "../layouts/Layout.astro";
 		timerId = setTimeout(() => {
 			const modalElement = document.getElementById("completionModal");
 			if (!modalElement) return;
+			
 			modalElement.classList.remove("hidden");
+
+			// Show cursor when completion modal appears
+			document.body.style.cursor = 'auto';
 		}, duration);
 	}
 
@@ -219,6 +226,9 @@ import Layout from "../layouts/Layout.astro";
 				console.log("Exit fullscreen failed:", err);
 			}
 		}
+
+		// Ensure cursor is visible when returning to main screen
+		document.body.style.cursor = 'auto';
 
 		modalElement.classList.add("hidden");
 		boredElement.classList.add("hidden");
