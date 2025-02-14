@@ -62,23 +62,31 @@ import Layout from "../layouts/Layout.astro";
 	const doneButton = document.getElementById("doneBtn");
 
 	if (beginButton && doneButton) {
-		beginButton.addEventListener("click", showBoredScreen);
-		doneButton.addEventListener("click", resetScreen);
+		beginButton.addEventListener("click", showBoredScreenAsync);
+		doneButton.addEventListener("click", resetScreenAsync);
 	}
 
 	let timerId: number;
 
-	function showBoredScreen() {
+	async function showBoredScreenAsync() {
 		const heroElement = document.getElementById("hero");
 		const boredElement = document.getElementById("boredScreen");
 
 		if (!heroElement || !boredElement) return;
 
+		// Request fullscreen
+		try {
+			await document.documentElement.requestFullscreen();
+		} catch (err) {
+			console.log("Fullscreen request failed:", err);
+		}
+
 		heroElement.classList.add("hidden");
 		boredElement.classList.remove("hidden");
 
-		// Start 10-minute timer
-		const duration = 10 * 60 * 1000; // 10 minutes in milliseconds
+		// Start timer
+		// const duration = 10 * 60 * 1000; // in milliseconds
+		const duration = 3 * 1000; // in milliseconds
 		timerId = setTimeout(() => {
 			const modalElement = document.getElementById("completionModal");
 			if (!modalElement) return;
@@ -86,12 +94,21 @@ import Layout from "../layouts/Layout.astro";
 		}, duration);
 	}
 
-	function resetScreen() {
+	async function resetScreenAsync() {
 		const modalElement = document.getElementById("completionModal");
 		const boredElement = document.getElementById("boredScreen");
 		const heroElement = document.getElementById("hero");
 
 		if (!modalElement || !boredElement || !heroElement) return;
+
+		// Exit fullscreen
+		if (document.fullscreenElement) {
+			try {
+				await document.exitFullscreen();
+			} catch (err) {
+				console.log("Exit fullscreen failed:", err);
+			}
+		}
 
 		modalElement.classList.add("hidden");
 		boredElement.classList.add("hidden");
