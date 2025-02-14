@@ -64,9 +64,18 @@ import Layout from "../layouts/Layout.astro";
 					<!-- Add countdown toggle -->
 					<div class="mb-6 flex items-center justify-between">
 						<label class="text-stone-300">Show countdown</label>
-						<label class="relative inline-flex items-center cursor-pointer">
-							<input type="checkbox" id="showCountdownToggle" class="sr-only peer">
-							<div class="w-11 h-6 bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-stone-600"></div>
+						<label
+							class="relative inline-flex items-center cursor-pointer"
+						>
+							<input
+								type="checkbox"
+								id="showCountdownToggle"
+								class="sr-only peer"
+							/>
+							<div
+								class="w-11 h-6 bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-stone-600"
+							>
+							</div>
 						</label>
 					</div>
 
@@ -96,7 +105,11 @@ import Layout from "../layouts/Layout.astro";
 					do absolutely nothing
 				</p>
 			</div>
-			<div id="countdown" class="fixed bottom-4 right-4 text-stone-600 text-sm hidden"></div>
+			<div
+				id="countdown"
+				class="fixed bottom-4 right-4 text-stone-600 text-sm hidden"
+			>
+			</div>
 		</div>
 
 		<!-- Completion Modal -->
@@ -154,7 +167,9 @@ import Layout from "../layouts/Layout.astro";
 		durationSlider.addEventListener("input", updateDuration);
 	}
 
-	const showCountdownToggle = document.getElementById("showCountdownToggle") as HTMLInputElement;
+	const showCountdownToggle = document.getElementById(
+		"showCountdownToggle",
+	) as HTMLInputElement;
 	if (showCountdownToggle) {
 		showCountdownToggle.addEventListener("change", (e) => {
 			showCountdown = (e.target as HTMLInputElement).checked;
@@ -201,8 +216,8 @@ import Layout from "../layouts/Layout.astro";
 
 		const minutes = Math.floor(timeLeft / (1000 * 60));
 		const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-		
-		countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+		countdownElement.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 	}
 
 	async function showBoredScreenAsync() {
@@ -220,30 +235,35 @@ import Layout from "../layouts/Layout.astro";
 		}
 
 		// Hide cursor when bored screen is shown
-		document.body.style.cursor = 'none';
+		document.body.style.cursor = "none";
 
 		heroElement.classList.add("hidden");
 		boredElement.classList.remove("hidden");
 
+		const duration = currentDuration * 60 * 1000; // in milliseconds
+		// const duration = 3 * 1000; // in milliseconds
+
 		// Setup countdown if enabled
 		if (showCountdown) {
 			countdownElement.classList.remove("hidden");
-			const endTime = new Date().getTime() + (currentDuration * 60 * 1000);
+			const endTime = new Date().getTime() + duration;
 			updateCountdown(endTime);
-			countdownInterval = setInterval(() => updateCountdown(endTime), 1000);
+			countdownInterval = setInterval(
+				() => updateCountdown(endTime),
+				1000,
+			);
 		}
 
 		// Start timer
-		const duration = currentDuration * 60 * 1000; // in milliseconds
 		timerId = setTimeout(() => {
 			const modalElement = document.getElementById("completionModal");
 			if (!modalElement) return;
-			
+
 			modalElement.classList.remove("hidden");
 			clearInterval(countdownInterval);
 
 			// Show cursor when completion modal appears
-			document.body.style.cursor = 'auto';
+			document.body.style.cursor = "auto";
 		}, duration);
 	}
 
@@ -264,7 +284,7 @@ import Layout from "../layouts/Layout.astro";
 		}
 
 		// Ensure cursor is visible when returning to main screen
-		document.body.style.cursor = 'auto';
+		document.body.style.cursor = "auto";
 
 		modalElement.classList.add("hidden");
 		boredElement.classList.add("hidden");
@@ -273,4 +293,26 @@ import Layout from "../layouts/Layout.astro";
 		clearTimeout(timerId);
 		clearInterval(countdownInterval);
 	}
+
+	// Add keyboard event listener for Escape key
+	document.addEventListener("keydown", async (e) => {
+		if (e.key === "Escape") {
+			const boredElement = document.getElementById("boredScreen");
+			// Only handle Escape if we're in the bored screen
+			if (boredElement && !boredElement.classList.contains("hidden")) {
+				await resetScreenAsync();
+			}
+		}
+	});
+
+	// Handle fullscreen exit
+	document.addEventListener("fullscreenchange", async () => {
+		if (!document.fullscreenElement) {
+			const boredElement = document.getElementById("boredScreen");
+			// Only reset if we're in the bored screen
+			if (boredElement && !boredElement.classList.contains("hidden")) {
+				await resetScreenAsync();
+			}
+		}
+	});
 </script>
