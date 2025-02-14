@@ -1,19 +1,102 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout>
 	<main class="h-dvh bg-stone-900">
-		<div class="container h-full mx-auto px-4 py-32 flex flex-col items-center justify-center">
-			<h1 class="text-6xl font-bold text-stone-100 mb-4 text-center">
+		<!-- Hero -->
+		<div
+			id="hero"
+			class="container h-full mx-auto px-4 py-32 flex flex-col items-center justify-center"
+		>
+			<h1
+				class="text-5xl sm:text-6xl font-bold text-stone-100 mb-4 text-center"
+			>
 				being bored
 			</h1>
 			<h2 class="text-2xl text-stone-400 mb-12 text-center">
 				reset your mind
 			</h2>
-			<button class="px-8 py-3 bg-stone-700 text-stone-100 rounded-lg hover:bg-stone-600 transition-colors text-lg">
+			<button
+				id="beginBtn"
+				class="px-8 py-3 bg-stone-700 text-stone-100 rounded-lg hover:bg-stone-600 transition-colors text-lg"
+			>
 				begin
 			</button>
 		</div>
+
+		<!-- Bored Screen -->
+		<div id="boredScreen" class="hidden h-full">
+			<div class="h-full flex flex-col items-center justify-center">
+				<p class="text-stone-100 text-center text-lg">stare and wait</p>
+				<p class="text-stone-100 text-center text-lg">
+					do absolutely nothing
+				</p>
+			</div>
+		</div>
+
+		<!-- Completion Modal -->
+		<div id="completionModal" class="hidden">
+			<div
+				class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-8"
+			>
+				<div class="bg-stone-800 px-16 py-8 rounded-lg text-center">
+					<div class="py-4"></div>
+					<h3 class="text-stone-100 text-2xl mb-6">congrats</h3>
+					<div class="py-4"></div>
+					<button
+						id="doneBtn"
+						class="px-6 py-2 bg-stone-700 text-stone-100 rounded-lg hover:bg-stone-600 transition-colors"
+					>
+						im bored
+					</button>
+				</div>
+			</div>
+		</div>
 	</main>
-</Layout>  
+</Layout>
+
+<script>
+	// Event listeners
+	const beginButton = document.getElementById("beginBtn");
+	const doneButton = document.getElementById("doneBtn");
+
+	if (beginButton && doneButton) {
+		beginButton.addEventListener("click", showBoredScreen);
+		doneButton.addEventListener("click", resetScreen);
+	}
+
+	let timerId: number;
+
+	function showBoredScreen() {
+		const heroElement = document.getElementById("hero");
+		const boredElement = document.getElementById("boredScreen");
+
+		if (!heroElement || !boredElement) return;
+
+		heroElement.classList.add("hidden");
+		boredElement.classList.remove("hidden");
+
+		// Start 10-minute timer
+		const duration = 10 * 60 * 1000; // 10 minutes in milliseconds
+		timerId = setTimeout(() => {
+			const modalElement = document.getElementById("completionModal");
+			if (!modalElement) return;
+			modalElement.classList.remove("hidden");
+		}, duration);
+	}
+
+	function resetScreen() {
+		const modalElement = document.getElementById("completionModal");
+		const boredElement = document.getElementById("boredScreen");
+		const heroElement = document.getElementById("hero");
+
+		if (!modalElement || !boredElement || !heroElement) return;
+
+		modalElement.classList.add("hidden");
+		boredElement.classList.add("hidden");
+		heroElement.classList.remove("hidden");
+
+		clearTimeout(timerId);
+	}
+</script>
