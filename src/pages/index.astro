@@ -61,6 +61,15 @@ import Layout from "../layouts/Layout.astro";
 						</div>
 					</div>
 
+					<!-- Add countdown toggle -->
+					<div class="mb-6 flex items-center justify-between">
+						<label class="text-stone-300">Show countdown</label>
+						<label class="relative inline-flex items-center cursor-pointer">
+							<input type="checkbox" id="showCountdownToggle" class="sr-only peer">
+							<div class="w-11 h-6 bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-stone-600"></div>
+						</label>
+					</div>
+
 					<div class="flex gap-3">
 						<button
 							id="closeSettingsBtn"
@@ -87,6 +96,7 @@ import Layout from "../layouts/Layout.astro";
 					do absolutely nothing
 				</p>
 			</div>
+			<div id="countdown" class="fixed bottom-4 right-4 text-stone-600 text-sm hidden"></div>
 		</div>
 
 		<!-- Completion Modal -->
@@ -123,9 +133,10 @@ import Layout from "../layouts/Layout.astro";
 	const durationValue = document.getElementById("durationValue");
 	const settingsModal = document.getElementById("settingsModal");
 
-	let originalDuration = 10;
-	let currentDuration = 10;
 	let timerId: number;
+	let currentDuration = 10;
+	let showCountdown = false;
+	let countdownInterval: number;
 
 	if (
 		beginButton &&
@@ -143,47 +154,63 @@ import Layout from "../layouts/Layout.astro";
 		durationSlider.addEventListener("input", updateDuration);
 	}
 
+	const showCountdownToggle = document.getElementById("showCountdownToggle") as HTMLInputElement;
+	if (showCountdownToggle) {
+		showCountdownToggle.addEventListener("change", (e) => {
+			showCountdown = (e.target as HTMLInputElement).checked;
+		});
+	}
+
 	function showSettings() {
 		if (!settingsModal) return;
 		settingsModal.classList.remove("hidden");
-		updateCloseButton();
 	}
 
 	function closeSettings() {
 		if (!settingsModal) return;
 		settingsModal.classList.add("hidden");
-		originalDuration = currentDuration;
 	}
 
 	function resetSettings() {
-		if (!durationSlider || !durationValue) return;
+		if (!durationSlider || !durationValue || !showCountdownToggle) return;
 		currentDuration = 10;
 		durationSlider.value = "10";
 		durationValue.textContent = "10 min";
-		updateCloseButton();
+		showCountdown = false;
+		showCountdownToggle.checked = false;
 	}
 
 	function updateDuration() {
 		if (!durationSlider || !durationValue) return;
 		currentDuration = parseInt(durationSlider.value);
 		durationValue.textContent = `${currentDuration} min`;
-		updateCloseButton();
 	}
 
-	function updateCloseButton() {
-		if (!closeSettingsButton) return;
-		if (currentDuration !== originalDuration) {
-			closeSettingsButton.textContent = "Save and Close";
-		} else {
-			closeSettingsButton.textContent = "Close";
+	function updateCountdown(endTime: number) {
+		const countdownElement = document.getElementById("countdown");
+		if (!countdownElement) return;
+
+		const now = new Date().getTime();
+		const timeLeft = endTime - now;
+
+		if (timeLeft <= 0) {
+			countdownElement.classList.add("hidden");
+			clearInterval(countdownInterval);
+			return;
 		}
+
+		const minutes = Math.floor(timeLeft / (1000 * 60));
+		const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+		
+		countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 	}
 
 	async function showBoredScreenAsync() {
 		const heroElement = document.getElementById("hero");
 		const boredElement = document.getElementById("boredScreen");
+		const countdownElement = document.getElementById("countdown");
 
-		if (!heroElement || !boredElement) return;
+		if (!heroElement || !boredElement || !countdownElement) return;
 
 		// Request fullscreen
 		try {
@@ -198,6 +225,14 @@ import Layout from "../layouts/Layout.astro";
 		heroElement.classList.add("hidden");
 		boredElement.classList.remove("hidden");
 
+		// Setup countdown if enabled
+		if (showCountdown) {
+			countdownElement.classList.remove("hidden");
+			const endTime = new Date().getTime() + (currentDuration * 60 * 1000);
+			updateCountdown(endTime);
+			countdownInterval = setInterval(() => updateCountdown(endTime), 1000);
+		}
+
 		// Start timer
 		const duration = currentDuration * 60 * 1000; // in milliseconds
 		timerId = setTimeout(() => {
@@ -205,6 +240,7 @@ import Layout from "../layouts/Layout.astro";
 			if (!modalElement) return;
 			
 			modalElement.classList.remove("hidden");
+			clearInterval(countdownInterval);
 
 			// Show cursor when completion modal appears
 			document.body.style.cursor = 'auto';
@@ -235,5 +271,6 @@ import Layout from "../layouts/Layout.astro";
 		heroElement.classList.remove("hidden");
 
 		clearTimeout(timerId);
+		clearInterval(countdownInterval);
 	}
 </script>
