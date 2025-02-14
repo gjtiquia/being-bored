@@ -1,0 +1,26 @@
+---
+interface Props {
+  id?: string;
+  variant?: 'primary' | 'secondary' | 'text';
+  class?: string;
+}
+
+const { 
+  id, 
+  variant = 'primary',
+  class: className = '' 
+} = Astro.props;
+
+const baseStyles = {
+  primary: 'px-8 py-3 bg-stone-700 text-stone-100 rounded-lg hover:bg-stone-600 transition-colors text-lg',
+  secondary: 'px-4 py-2 bg-stone-700 text-stone-100 rounded-lg hover:bg-stone-600 transition-colors',
+  text: 'text-stone-500 text-sm hover:text-stone-400 transition-colors underline'
+};
+---
+
+<button
+  id={id}
+  class:list={[baseStyles[variant], className]}
+>
+  <slot />
+</button> 

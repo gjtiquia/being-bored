@@ -1,0 +1,53 @@
+---
+import Button from './Button.astro';
+---
+
+<div id="settingsModal" class="hidden">
+  <div
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-8"
+  >
+    <div class="bg-stone-800 px-8 py-6 rounded-lg w-full max-w-md">
+      <h3 class="text-stone-100 text-xl mb-6">Settings</h3>
+
+      <div class="mb-6">
+        <label class="block text-stone-300 mb-2">Duration (minutes)</label>
+        <input
+          type="range"
+          id="durationSlider"
+          min="1"
+          max="10"
+          value="10"
+          class="w-full accent-stone-600"
+        />
+        <div class="flex justify-between text-stone-400 text-sm mt-1">
+          <span>1 min</span>
+          <span id="durationValue">10 min</span>
+        </div>
+      </div>
+
+      <div class="mb-6 flex items-center justify-between">
+        <label class="text-stone-300">Show countdown</label>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            id="showCountdownToggle"
+            class="sr-only peer"
+          />
+          <div
+            class="w-11 h-6 bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-stone-600"
+          >
+          </div>
+        </label>
+      </div>
+
+      <div class="flex gap-3">
+        <Button id="closeSettingsBtn" variant="secondary">
+          Close
+        </Button>
+        <Button id="resetBtn" variant="text">
+          Reset
+        </Button>
+      </div>
+    </div>
+  </div>
+</div> 
