@@ -1,0 +1,17 @@
+{
+    "name": "being bored",
+    "short_name": "beingbored",
+    "description": "reset your mind through intentional boredom",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#1c1917",
+    "theme_color": "#1c1917",
+    "icons": [
+        {
+            "src": "/favicon.svg",
+            "type": "image/svg+xml",
+            "sizes": "any",
+            "purpose": "any"
+        }
+    ]
+}
